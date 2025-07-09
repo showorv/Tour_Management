@@ -1,23 +1,21 @@
-import { Request, Response } from "express";
-import { User } from "./user.model";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes"
+import { userService } from "./user.service";
 
-const createUser = async (req: Request,res: Response)=>{
+const createUser = async (req: Request,res: Response, next: NextFunction)=>{
 
     try {
-        const {name, email} = req.body
-
-        const user = await User.create({name,email});
+       
+        
+        const user = await userService.createUser(req.body);
     
         res.status(httpStatus.CREATED).json({
             message: "User created successfully",
             data: user
         })
         
-    } catch (error: any) {
-        res.status(httpStatus.BAD_REQUEST).json({
-            message: `Something went wrong ${error.message}`
-        })
+    } catch (error) {
+        next(error)
     }
    
 }

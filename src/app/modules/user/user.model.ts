@@ -1,6 +1,6 @@
 import {  Schema, model } from "mongoose";
 import { IActive, IAuths, Iuser, Role } from "./user.interface";
-import { string } from "zod";
+
 
 const authEmebededSchema = new Schema<IAuths>(
     {
