@@ -1,13 +1,24 @@
-import { Iuser } from "./user.interface"
+import AppError from "../../errorHelpers/AppError"
+import { IAuths, Iuser } from "./user.interface"
 import { User } from "./user.model"
-
+import httpStatus from "http-status-codes"
 const createUser =async (payload: Partial<Iuser>)=>{
 
-    const {name,email } = payload
+    const {email, ...rest } = payload
+
+    const userExist = await User.findOne({email})
+
+    if(userExist){
+        throw new AppError(httpStatus.BAD_REQUEST, "email already exist")
+    }
+
+    const authProvider: IAuths = { provider: "credential", providerId: email as string}
 
     const user = await User.create({
-        name,
-        email
+        
+        email,
+        auths: [ authProvider],
+        ...rest
     })
 
     return user;

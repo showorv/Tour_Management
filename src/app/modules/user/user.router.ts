@@ -1,9 +1,16 @@
-import{ Router } from "express"
-import { userController } from "./user.controller"
+import { Router } from "express";
+import { userController } from "./user.controller";
 
-const router = Router()
+import { createUserValidation } from "./user.validation";
+import { validateSchma } from "../../middlewares/validationSchema";
 
-router.post("/register", userController.createUser)
-router.get("/users", userController.getAllUser)
+const router = Router();
 
-export const userRouter = router
+router.post(
+  "/register",
+  validateSchma(createUserValidation),
+  userController.createUser
+);
+router.get("/users", userController.getAllUser);
+
+export const userRouter = router;
