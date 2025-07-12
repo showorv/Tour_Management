@@ -15,10 +15,14 @@ export const checkAuth = (...authRoles: string[])=>async(req:Request, res: Respo
 
     const verifiedTokens = verifiedToken(accessToken, envVars.JWT_SECRET as string) as JwtPayload
 
+    req.user = verifiedToken;
+
     if(!authRoles.includes(verifiedTokens.role)){
       throw new AppError(403,"you cannot access this route")
     }
+
     next()
+    
     } catch (error) {
         next(error)
     }
