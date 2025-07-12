@@ -3,6 +3,7 @@ import { IAuths, Iuser } from "./user.interface"
 import { User } from "./user.model"
 import httpStatus from "http-status-codes"
 import bcryptjs from "bcryptjs"
+import { envVars } from "../../config/env"
 
 
 const createUser =async (payload: Partial<Iuser>)=>{
@@ -15,7 +16,7 @@ const createUser =async (payload: Partial<Iuser>)=>{
         throw new AppError(httpStatus.BAD_REQUEST, "email already exist")
     }
 
-    const hashPassword = await bcryptjs.hash(password as string, 10);
+    const hashPassword = await bcryptjs.hash(password as string, Number(envVars.HASH_SALT ));
 
 
     const authProvider: IAuths = { provider: "credential", providerId: email as string}

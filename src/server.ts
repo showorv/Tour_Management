@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import app from "./app";
 import {Server} from "http"
 import { envVars } from "./app/config/env";
+import { superAdmin } from "./app/seed/seed";
 
 
 let server: Server;
@@ -24,8 +25,11 @@ async function main() {
         
     }
 }
+(async()=>{
+   await main()
+   await superAdmin()
+})()
 
-main()
 
 // server error handle and server off
 

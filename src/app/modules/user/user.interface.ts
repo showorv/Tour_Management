@@ -27,7 +27,7 @@ export interface Iuser {
     address?: string;
     isDeleted?: string;
     isActive?: string;
-    isVerified?: string;
+    isVerified?: boolean;
     role: Role;
     auths: IAuths[] // user google o dite prbe + chaile update e passoword o dite prbe
     bookings?: Types.ObjectId[]

@@ -1,8 +1,9 @@
-import { Router } from "express";
+import {  Router} from "express";
 import { userController } from "./user.controller";
 
 import { createUserValidation } from "./user.validation";
 import { validateSchma } from "../../middlewares/validationSchema";
+import { checkAuth } from "../../middlewares/checkAuth";
 
 const router = Router();
 
@@ -11,6 +12,6 @@ router.post(
   validateSchma(createUserValidation),
   userController.createUser
 );
-router.get("/users", userController.getAllUser);
+router.get("/users",checkAuth("ADMIN","SUPERADMIN"), userController.getAllUser);
 
 export const userRouter = router;

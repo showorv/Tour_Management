@@ -5,6 +5,8 @@ import { User } from "../user/user.model";
 import httpsCode from "http-status-codes"
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
+import { generateToken } from "../../utils/generateToken";
+import { envVars } from "../../config/env";
 const createLoginService =async (payload: Partial<Iuser>)=>{
 
     const {email, password} = payload
@@ -27,9 +29,7 @@ const createLoginService =async (payload: Partial<Iuser>)=>{
         email: userExist.email,
         role: userExist.role
     }
-    const accessToken = jwt.sign(jsonPayload, "secret", {
-        expiresIn:"1d"
-    })
+    const accessToken = generateToken(jsonPayload, envVars.JWT_SECRET as string, envVars.JWR_EXPIRED as string)
 
     return {
         accessToken
