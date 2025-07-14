@@ -17,6 +17,21 @@ const createLogin = catchAsyncError(async(req: Request, res: Response)=>{
     
 })
 
+
+const getNewAccessToken = catchAsyncError(async(req: Request, res: Response)=>{
+
+    const token = req.headers.authorization
+    const accessToken= await authService.getNewAccessToken(token as string)
+
+    res.status(httpsCode.OK).json({
+        success: true,
+        message: "User get new accessToken",
+        data: accessToken
+    })
+    
+})
+
 export const authController = {
-    createLogin
+    createLogin,
+    getNewAccessToken
 }
