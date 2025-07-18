@@ -82,8 +82,28 @@ const logout = catchAsyncError(async(req: Request, res: Response)=>{
     
 })
 
+
+const resetPassword = catchAsyncError(async(req: Request, res: Response)=>{
+
+    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword
+
+    const decodedToken =  req.user
+
+    await authService.resetPassword(oldPassword, newPassword, decodedToken)
+
+
+    res.status(httpsCode.OK).json({
+        success: true,
+        message: "password reset successfully",
+        data: null
+    })
+    
+})
+
 export const authController = {
     createLogin,
     getNewAccessToken,
-    logout
+    logout,
+    resetPassword
 }

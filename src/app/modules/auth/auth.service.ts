@@ -73,7 +73,31 @@ const getNewAccessToken =async ( refreshToken: string)=>{
     }
 
 }
+const resetPassword =async (oldPassword: string, newPassword: string, decodedToken: JwtPayload)=>{
+
+    // check old password  get old password from verifiedtoken. hash the newpassword and save in user
+
+    const user = await User.findById(decodedToken.userId);
+      
+    if(!user){
+        throw new AppError(httpsCode.FORBIDDEN, "user not found")
+    }
+
+    const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user.password as string);
+
+    if(!isOldPasswordMatch){
+        throw new AppError(httpsCode.FORBIDDEN, "old password is incorrect")
+    }
+
+    user.password = await bcryptjs.hash(newPassword, Number(envVars.HASH_SALT))
+
+    user.save();
+
+}
+
+
 export const authService = {
     createLoginService,
-    getNewAccessToken
+    getNewAccessToken,
+    resetPassword
 }
