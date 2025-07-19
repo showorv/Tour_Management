@@ -19,6 +19,7 @@ export enum IActive{
 
 }
 export interface Iuser {
+    _id?: string,
     name: string;
     email: string;
     password ?: string;

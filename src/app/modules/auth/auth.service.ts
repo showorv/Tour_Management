@@ -7,6 +7,7 @@ import bcryptjs from "bcryptjs"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { generateToken, verifiedToken } from "../../utils/generateToken";
 import { envVars } from "../../config/env";
+import { createUserToken } from "../../utils/createUserToken";
 
 
 const createLoginService =async (payload: Partial<Iuser>)=>{
@@ -25,19 +26,19 @@ const createLoginService =async (payload: Partial<Iuser>)=>{
         throw new AppError(httpsCode.BAD_REQUEST, "password is incorrect")
     }
 
-    const jsonPayload = {
-        userId: userExist._id,
-        email: userExist.email,
-        role: userExist.role
-    }
-    const accessToken = generateToken(jsonPayload, envVars.JWT_SECRET as string, envVars.JWR_EXPIRED as string)
-    const refreshToken = generateToken(jsonPayload, envVars.JWT_REFRESH_SECRET as string, envVars.JWT_REFRESH_EXPIRED as string)
+    // const jsonPayload = {
+    //     userId: userExist._id,
+    //     email: userExist.email,
+    //     role: userExist.role
+    // }
+    const accessUserToken =createUserToken(userExist)
+    // const refreshToken = generateToken(jsonPayload, envVars.JWT_REFRESH_SECRET as string, envVars.JWT_REFRESH_EXPIRED as string)
 
   const {password: pass, ...rest} = userExist.toObject()
 
     return {
-        accessToken,
-        refreshToken,
+        accessToken: accessUserToken.accessToken,
+        refreshToken: accessUserToken.refreshToken,
         user: rest
     }
 }

@@ -1,13 +1,22 @@
 import express, { Application, Request, Response } from "express"
-
+import "./app/config/passport"
 import cors from "cors"
 import { router } from "./app/routers"
 import { globalError } from "./app/middlewares/globalErrorHandle"
 import { routeNotFound } from "./app/middlewares/routeNotFound"
 import cookieParser from "cookie-parser"
+import passport from "passport"
+import expressSession from "express-session"
 
 const app:Application = express()
 
+app.use(expressSession({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(cookieParser())
 app.use(express.json())
 

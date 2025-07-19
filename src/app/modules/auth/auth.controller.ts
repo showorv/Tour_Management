@@ -6,6 +6,11 @@ import { authService } from "./auth.service";
 import httpsCode from "http-status-codes"
 import AppError from "../../errorHelpers/AppError";
 import { setCookies } from "../../utils/cookieSet";
+import { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
+import { createUserToken } from "../../utils/createUserToken";
+import { Iuser } from "../user/user.interface";
+import { envVars } from "../../config/env";
 
 const createLogin = catchAsyncError(async(req: Request, res: Response)=>{
 
@@ -90,7 +95,7 @@ const resetPassword = catchAsyncError(async(req: Request, res: Response)=>{
 
     const decodedToken =  req.user
 
-    await authService.resetPassword(oldPassword, newPassword, decodedToken)
+    await authService.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload)
 
 
     res.status(httpsCode.OK).json({
@@ -101,9 +106,56 @@ const resetPassword = catchAsyncError(async(req: Request, res: Response)=>{
     
 })
 
+
+// http://localhost:5000/api/v1/auth/google?redirect=/booking
+
+const googleController = catchAsyncError(async(req: Request, res: Response)=>{
+
+    const redirect = req.query.redirect || "";
+
+
+    passport.authenticate("google", {scope: ["profile", "email"], state: redirect as string})(req,res)
+
+    
+})
+
+// http://localhost:5000/api/v1/auth/google/callback?state=/booking or /
+const googleCallback = catchAsyncError(async(req: Request, res: Response)=>{
+
+    let state = req.query.state? req.query.state as string : ""
+
+    if(state.startsWith("/")){
+        state= state.slice(1) // /booking-> booking
+    }
+    
+    //  jkhn passport e user create hobe tkhn passport amdr k ta req.user e diye dibe
+
+    const user= req.user
+
+    console.log("user", user);
+    
+
+    if(!user){
+        throw new AppError(httpsCode.NOT_FOUND, "user not found")
+    }
+
+    const tokenInfo = createUserToken(user as Iuser);
+
+    setCookies(res, tokenInfo);
+
+
+    
+
+    res.redirect(`${envVars.FRONTEND_URL as string}/${state}`)
+ 
+    
+})
+
 export const authController = {
     createLogin,
     getNewAccessToken,
     logout,
-    resetPassword
+    resetPassword,
+    googleCallback,
+    googleController
 }
