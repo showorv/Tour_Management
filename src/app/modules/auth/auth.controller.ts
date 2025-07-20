@@ -1,6 +1,6 @@
 
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { catchAsyncError } from "../../utils/catchAsyncError";
 import { authService } from "./auth.service";
 import httpsCode from "http-status-codes"
@@ -12,9 +12,11 @@ import { createUserToken } from "../../utils/createUserToken";
 import { Iuser } from "../user/user.interface";
 import { envVars } from "../../config/env";
 
-const createLogin = catchAsyncError(async(req: Request, res: Response)=>{
+const createLogin = catchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
 
-    const loginInfo = await authService.createLoginService(req.body)
+    //manual login
+
+    // const loginInfo = await authService.createLoginService(req.body)
 
     // res.cookie("access-token", loginInfo.accessToken, {
     //     httpOnly: true,
@@ -26,13 +28,48 @@ const createLogin = catchAsyncError(async(req: Request, res: Response)=>{
     //     secure: false // eta na dile frontend e cookie access korte dibe na cors er karone
     // })
 
-    setCookies(res,loginInfo)
+    // setCookies(res,loginInfo)
 
-    res.status(httpsCode.OK).json({
-        success: true,
-        message: "User logged in successfully",
-        data: loginInfo
-    })
+    // res.status(httpsCode.OK).json({
+    //     success: true,
+    //     message: "User logged in successfully",
+    //     data: loginInfo
+    // })
+
+
+
+    //passport local login
+
+    passport.authenticate("local", async(err: any, user: any, info: any)=>{
+
+        if(err){
+            // return new AppError(401, err) dewa jabe na direct
+            return next(new AppError(401, err))
+        }
+
+        if(!user){
+            return next( new AppError(401, info.message) )// all are comes from passport.ts local
+        }
+
+        const userToken = createUserToken(user);
+
+        setCookies(res,userToken)
+
+        // delete user.toObject().password
+
+        const {password, ...rest} = user.toObject()
+
+        res.status(httpsCode.OK).json({
+            success: true,
+            message: "User logged in successfully",
+            data: {
+                accessToken: userToken.accessToken,
+                refreshToken: userToken.refreshToken,
+                user: rest
+            }
+        })
+
+    })(req,res,next)
     
 })
 

@@ -5,6 +5,45 @@ import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-go
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interface";
+import { Strategy as  LocalStrategy} from "passport-local";
+import bcryptjs from "bcryptjs"
+
+passport.use(
+    new LocalStrategy({
+
+        // passport local e username r password field rkhe seta rename korte hbe
+
+        usernameField: "email",
+        passwordField: "password"
+    }, async(email: string, password: string, done)=>{
+
+        const userExist = await User.findOne({email})
+
+        if(!userExist){
+            return done(null, false, {message: "user doesnot exist"})
+        }
+
+        const isGoogleAuthenticated = userExist.auths.some(providerCheck => providerCheck.provider == "google");
+
+        if(isGoogleAuthenticated && !userExist.password){
+            return done (null, false, {message: "You signed up with Google. To use email and password, log in with Google first and set a password."})
+        }
+
+    
+        const isPasswordMatch = await bcryptjs.compare(password as string, userExist.password as string)
+    
+    
+        if(!isPasswordMatch){
+            return done(null, false, {message: "password doesnot match"})
+        }
+
+        return done(null, userExist)
+    })
+)
+
+
+
+
 // bridge == goolge ? db store -> token -> already store thakle only token provide
 
 
