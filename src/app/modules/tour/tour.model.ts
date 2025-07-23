@@ -8,10 +8,13 @@ const tourTypeSchema = new Schema <ItourType>({
         required: true,
         unique: true
     }
-},{timestamps: true, versionKey: true})
+},{timestamps: true, versionKey: false})
 
 
 export const TourType = model<ItourType> ("TourType", tourTypeSchema)
+
+
+
 
 const tourSchema = new Schema<ITour>({
     title: {
@@ -20,7 +23,7 @@ const tourSchema = new Schema<ITour>({
     },
     slug: {
         type: String,
-        required: true,
+      
         unique: true
     },
     description: { type: String},
