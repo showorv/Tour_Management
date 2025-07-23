@@ -65,7 +65,7 @@ const updateUser = catchAsyncError(async(req: Request,res: Response)=>{
 
     const payload = req.body
 
-    const updateUser = await userService.updateUser(userId, payload, tokenVerified)
+    const updateUser = await userService.updateUser(userId, payload, tokenVerified as JwtPayload)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,

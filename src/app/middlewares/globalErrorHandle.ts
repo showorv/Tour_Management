@@ -39,6 +39,10 @@ export const globalError = (err:any, req: Request, res: Response, next: NextFunc
         statuscode = 400;
         message = "Invalid Mongodb ObjectId"
 
+        errorSources.push({
+            path: err.path,
+            message: `Invalid value for ${err.path}`,
+        });
 
     }else if(err.name === "ValidationError"){
         statuscode= 400;
