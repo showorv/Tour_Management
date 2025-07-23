@@ -74,7 +74,10 @@ const createTour = catchAsyncError (async(req: Request, res: Response)=>{
     })
 })
 const getTour = catchAsyncError (async(req: Request, res: Response)=>{
-    const allTour= await tourService.getAllTour()
+
+    const query = req.query
+
+    const allTour= await tourService.getAllTour(query as Record<string,string>)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
