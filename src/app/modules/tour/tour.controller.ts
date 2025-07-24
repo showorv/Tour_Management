@@ -88,6 +88,24 @@ const getTour = catchAsyncError (async(req: Request, res: Response)=>{
        
     })
 })
+
+const getSingleTour = catchAsyncError (async(req: Request, res: Response)=>{
+
+    const slug = req.params.slug
+
+    const allTour= await tourService.getSingleTour(slug)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "tour get successfully",
+        data: allTour,
+       
+       
+    })
+})
+
+
 const updateTour = catchAsyncError (async(req: Request, res: Response)=>{
 
     const id = req.params.id
@@ -124,4 +142,4 @@ const deleteTour = catchAsyncError (async(req: Request, res: Response)=>{
 
 
 
-export const tourController = {createTour, getTour, updateTour, deleteTour , createTourType, getTourType, updateTourType, deleteTourType}
+export const tourController = {createTour, getTour, updateTour, deleteTour , createTourType, getTourType, updateTourType, deleteTourType, getSingleTour}

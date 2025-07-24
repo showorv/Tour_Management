@@ -3,6 +3,8 @@ import AppError from "../../errorHelpers/AppError"
 import { ITour, ItourType } from "./tour.interface"
 import { Tour, TourType } from "./tour.model"
 import { tourSearchable } from "./tour.constants"
+import { Query } from "mongoose"
+import { QueryBuilder } from "../../utils/queryBuilder"
 
 
 const createTourService = async (payload: ITour)=>{
@@ -31,74 +33,114 @@ const createTourService = async (payload: ITour)=>{
     return tour
 }
 
+//! without queryBuilder
+
+// const getAllTour = async(query: Record<string, string>)=>{ // query is a object thats why record
+//      console.log(query);
+//      const filter = query
+//          // const tour = await Tour.find(query);
+
+//      const searchItem = query.searchItem || "";
+
+//      const sort = query.sort || "-createdAt"
+
+//      const fieldFiltering = query.fieldFiltering?.split(",").join(" ") || "" //title,location => title location
+
+//      const page = Number(query.page) || 1
+//      const limit = Number(query.limit) || 10
+//      const skip = (page -1)*limit
+
+//      delete filter["searchItem"]  // ?location=Dhaka&searchItem=ban  delete na korle query filter kore r search korte parbe na. tai filter theke search delete korbo
+//      delete filter["sort"]
+//      delete filter["fieldFiltering"]
+//      delete filter["limit"]
+//      delete filter["page"]
+
+//     //  const deletedFiled = ["searchItem", "sort"]
+//     //  for(const field of deletedFiled ){
+//     //     delete filter[field]
+//     //  }
+
+
+
+//     //  console.log(query); // location=Dhaka
+     
+//     //  const tourSearchable = [ "title", "description", "location"]
+
+//     //  const searchArray = tourSearchable.map(field => ({[field]:{ $regex: searchItem, $options: "i"} }))
+
+//      const searchQuery = {
+//         $or: tourSearchable.map(field => ({[field]:{ $regex: searchItem, $options: "i"} }))
+//      }
+
+//     const tour = await Tour.find(searchQuery ).find(filter).sort(sort).select(fieldFiltering).skip(skip).limit(limit);    
+    
+//     //     {
+//         //     $or: searchArray
+//         //      [
+//         //        { title: { $regex: searchItem, $options: "i"}}, // options i is case insensitive
+//         //        { description: {$regex: searchItem, $options: "i"}},
+//         //        { location: {$regex: searchItem, $options: "i"}}
+//         //     ]
+            
+//         // }
+
+//     const totalTour = await Tour.countDocuments()
+//     const totalPage = Math.ceil(totalTour/limit)
+
+//     const meta = {
+//         page: page,
+//         limit: limit,
+//         total: totalTour,
+//         totalPage: totalPage,
+        
+//     }
+
+//     return{
+//         data: tour,
+//         meta: meta
+//     }
+// }
+
+
+//! With queryBuilder ->> for reusing for all model filtering -> user,tour etc
+// first create class of queryBuilder 
+
+
 
 const getAllTour = async(query: Record<string, string>)=>{ // query is a object thats why record
-     console.log(query);
-     const filter = query
-         // const tour = await Tour.find(query);
-
-     const searchItem = query.searchItem || "";
-
-     const sort = query.sort || "-createdAt"
-
-     const fieldFiltering = query.fieldFiltering?.split(",").join(" ") || "" //title,location => title location
-
-     const page = Number(query.page) || 1
-     const limit = Number(query.limit) || 10
-     const skip = (page -1)*limit
-
-     delete filter["searchItem"]  // ?location=Dhaka&searchItem=ban  delete na korle query filter kore r search korte parbe na. tai filter theke search delete korbo
-     delete filter["sort"]
-     delete filter["fieldFiltering"]
-     delete filter["limit"]
-     delete filter["page"]
-
-    //  const deletedFiled = ["searchItem", "sort"]
-    //  for(const field of deletedFiled ){
-    //     delete filter[field]
-    //  }
-
-
-
-    //  console.log(query); // location=Dhaka
+    //  console.log(query);
      
-    //  const tourSearchable = [ "title", "description", "location"]
+    // const tour = await Tour.find(searchQuery ).find(filter).sort(sort).select(fieldFiltering).skip(skip).limit(limit);    
 
-    //  const searchArray = tourSearchable.map(field => ({[field]:{ $regex: searchItem, $options: "i"} }))
+    const queryBuilder =  new QueryBuilder(Tour.find(), query)
 
-     const searchQuery = {
-        $or: tourSearchable.map(field => ({[field]:{ $regex: searchItem, $options: "i"} }))
-     }
+    const allTour = await queryBuilder
+    .search(tourSearchable)
+    .filter()
+    .sort()
+    .fieldsFiltering()
+    .paginate()
+    // .modelQuery
+    // .build()
 
-    const tour = await Tour.find(searchQuery ).find(filter).sort(sort).select(fieldFiltering).skip(skip).limit(limit);    
-    
-    //     {
-        //     $or: searchArray
-        //      [
-        //        { title: { $regex: searchItem, $options: "i"}}, // options i is case insensitive
-        //        { description: {$regex: searchItem, $options: "i"}},
-        //        { location: {$regex: searchItem, $options: "i"}}
-        //     ]
-            
-        // }
+    const [data,meta] = await Promise.all([
+        allTour.build(),
+        queryBuilder.getMeta()
+    ])
 
-    const totalTour = await Tour.countDocuments()
-    const totalPage = Math.ceil(totalTour/limit)
-
-    const meta = {
-        page: page,
-        limit: limit,
-        total: totalTour,
-        totalPage: totalPage,
-        
-    }
-
+   
     return{
-        data: tour,
-        meta: meta
+        data,
+        meta
     }
 }
 
+const getSingleTour = async (slug: string)=>{
+    const tour = await Tour.findOne({slug})
+
+    return tour;
+}
 
 const updateTour = async (id: string, payload: Partial<ITour>)=> {
 
@@ -170,4 +212,4 @@ const deleteTourType = async (id: string) => {
 };
 
 
-export const tourService = { createTourService, getAllTour, updateTour, deleteTour, createTourType, getAllTourTypes, updateTourType, deleteTourType}
+export const tourService = { createTourService, getAllTour, updateTour, deleteTour, createTourType, getAllTourTypes, updateTourType, deleteTourType, getSingleTour}

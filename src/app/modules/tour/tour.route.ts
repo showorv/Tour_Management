@@ -27,6 +27,7 @@ router.delete("/tour-type/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), tourCont
 
 router.post("/create", checkAuth(Role.ADMIN, Role.SUPERADMIN), validateSchma(createTourZodSchema), tourController.createTour)
 router.get("/",  tourController.getTour)
+router.get("/:slug",  tourController.getSingleTour)
 router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), validateSchma(updateTourZodSchema), tourController.updateTour)
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), tourController.deleteTour)
 
