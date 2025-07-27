@@ -24,7 +24,7 @@ const createBooking = catchAsyncError(async(req: Request, res: Response)=>{
 const getAllBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = bookingService.getAllBooking()
+    const booking =await bookingService.getAllBooking()
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -36,7 +36,7 @@ const getAllBooking = catchAsyncError(async(req: Request, res: Response)=>{
 const getUserBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = bookingService.getUserBooking()
+    const booking = await bookingService.getUserBooking()
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -48,7 +48,7 @@ const getUserBooking = catchAsyncError(async(req: Request, res: Response)=>{
 const getSingleBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = bookingService.getSingleBooking()
+    const booking = await bookingService.getSingleBooking()
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -60,7 +60,7 @@ const getSingleBooking = catchAsyncError(async(req: Request, res: Response)=>{
 const updateStatusBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = bookingService.updateStatusBooking()
+    const booking = await bookingService.updateStatusBooking()
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
