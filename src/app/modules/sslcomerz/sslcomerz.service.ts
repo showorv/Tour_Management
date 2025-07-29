@@ -3,6 +3,7 @@ import AppError from "../../errorHelpers/AppError";
 import { ISSLComerz } from "./sslcomerz.interface";
 import axios from "axios"
 import httpsCode from "http-status-codes"
+
 const sslcomerzInitialize = async (payload: ISSLComerz)=>{
     try {
         const data = {
@@ -11,9 +12,9 @@ const sslcomerzInitialize = async (payload: ISSLComerz)=>{
             total_amount: payload.amount,
             currency: "BDT",
             tran_id: payload.transactionId,
-            success_url:envVars.SSL.SSL_SUCCESS_BACKEND_URL ,
-            fail_url:envVars.SSL.SSL_FAIL_BACKEND_URL,
-            cancel_url:envVars.SSL.SSL_CANCEL_BACKEND_URL ,
+            success_url:`${envVars.SSL.SSL_SUCCESS_BACKEND_URL }?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
+            fail_url:`${envVars.SSL.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
+            cancel_url:`${envVars.SSL.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel` ,
             // ipn_url: "http://localhost:3030/ipn",
             shipping_method: "N/A",
             product_name: "Tour",
@@ -52,3 +53,5 @@ const sslcomerzInitialize = async (payload: ISSLComerz)=>{
     }
    
 }
+
+export const sslcomerzService = {sslcomerzInitialize}

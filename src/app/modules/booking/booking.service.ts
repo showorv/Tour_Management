@@ -6,6 +6,8 @@ import { Booking } from "./booking.model"
 import { Payment } from "../payment/payment.model"
 import { PaymentStatus } from "../payment/payment.interface"
 import { Tour } from "../tour/tour.model"
+import { ISSLComerz } from "../sslcomerz/sslcomerz.interface"
+import { sslcomerzService } from "../sslcomerz/sslcomerz.service"
 
 
 const getTransaction = ()=>{
@@ -32,7 +34,7 @@ const getTransaction = ()=>{
 
 /* 
 
-1/ Frontend(localhost:5173)-> user-> tour -> booking (pending) -> payment (unpaid) -> sslcomerz page -> payment complete -> backend api -> update booking (success) payment (paid) -> redirect -> Frontend (localhost:5173/payment/sucess)
+1/ Frontend(localhost:5173)-> user-> tour -> booking (pending) -> payment (unpaid) -> sslcomerz page -> payment complete -> backend api(payment/success) -> update booking (success) payment (paid) -> redirect -> Frontend (localhost:5173/payment/sucess)
 
 2/ Frontend(localhost:5173)-> user-> tour -> booking (pending) -> payment (unpaid) -> sslcomerz page -> payment failed/canceled -> backend api -> update booking (pending) payment (unpaid) -> redirect -> Frontend (localhost:5173/payment/fail or cancel)
 
@@ -93,10 +95,37 @@ const createBookings = async(payload: Partial<IBooking>, userId: string)=>{
                                             .populate("tour", "title costFrom")
                                             .populate("payment")
     
-                                            await session.commitTransaction() // transaction here
-                                            session.endSession()
+
+            
+                                          
+    const userAddress =( updatedBoking?.user as any).address;
+    const userName =( updatedBoking?.user as any).name;
+    const userPhone =( updatedBoking?.user as any).phone;
+    const userEmail =( updatedBoking?.user as any).email;
+
+    const sslPayload : ISSLComerz = {
+        
+        address: userAddress,
+        name: userName,
+        phone: userPhone,
+        email: userEmail,
+        transactionId: transactionId,
+        amount: amount
+
+    }
+
+   const sslcomerz =  await sslcomerzService.sslcomerzInitialize(sslPayload)
     
-        return updatedBoking;
+     await session.commitTransaction() // transaction here
+     session.endSession()                              
+    
+        // return updatedBoking;
+
+        return {
+            // payment: sslcomerz, ekhane amader shudhu gatewaypageurl drokasr
+            paymentUrl: sslcomerz.GatewayPageURL,
+            booking: updatedBoking
+        }
         
     } catch (error) {
         await session.abortTransaction() // rollback
