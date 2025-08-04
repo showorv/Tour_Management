@@ -3,6 +3,8 @@ import { catchAsyncError } from "../../utils/catchAsyncError";
 import { tourService } from "./tour.service";
 import { sendResponse } from "../../utils/response";
 import httpStatus from "http-status-codes"
+import { ITour } from "./tour.interface";
+
 
 // tour type
 
@@ -10,6 +12,7 @@ import httpStatus from "http-status-codes"
 const createTourType = catchAsyncError (async(req: Request, res: Response)=>{
 
     // const { name } = req.body;
+
     const result = await tourService.createTourType(req.body);
     sendResponse(res, {
         statusCode: 201,
@@ -61,8 +64,16 @@ const deleteTourType = catchAsyncError (async(req: Request, res: Response)=>{
 
 
 const createTour = catchAsyncError (async(req: Request, res: Response)=>{
+
+    // throw new AppError(httpStatus.NOT_FOUND,"Tour type not found."); // to check deleted image if not controller works
+
+
+    const payload : ITour = {
+        ...req.body,
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
+    }
     
-    const createTour = await tourService.createTourService(req.body)
+    const createTour = await tourService.createTourService(payload)
 
 
     sendResponse(res, {

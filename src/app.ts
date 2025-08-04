@@ -19,6 +19,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({extended: true})) // for read form-data
 
 app.use(cors())
 

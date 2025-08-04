@@ -4,11 +4,13 @@ import { Role } from "../user/user.interface";
 import { validateSchma } from "../../middlewares/validationSchema";
 import { divisionController } from "./division.controller";
 import { createDivisionSchema, updateDivisionSchema } from "./division.validation";
+import { multerUpload } from "../../config/multer.config";
 
 
 const route = Router()
 
 route.post("/create", checkAuth(Role.SUPERADMIN, Role.ADMIN),
+multerUpload.single("file"),
  validateSchma(createDivisionSchema), 
  divisionController.createDivision)
 
