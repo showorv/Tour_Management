@@ -31,6 +31,9 @@ export const checkAuth = (...authRoles: string[])=>async(req:Request, res: Respo
       if(userExist.isDeleted){
           throw new AppError(httpsCode.BAD_REQUEST, "user is deleted")
       }
+      if(!userExist.isVerified){
+        throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
+      }
 
 
     req.user = verifiedTokens;

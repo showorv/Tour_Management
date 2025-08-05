@@ -121,7 +121,12 @@ const updateTour = catchAsyncError (async(req: Request, res: Response)=>{
 
     const id = req.params.id
 
-    const updateTours= await tourService.updateTour(id, req.body)
+    const payload : ITour = {
+        ...req.body,
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
+    }
+
+    const updateTours= await tourService.updateTour(id, payload)
 
 
     sendResponse(res, {

@@ -125,6 +125,23 @@ const logout = catchAsyncError(async(req: Request, res: Response)=>{
 })
 
 
+const changePassword = catchAsyncError(async(req: Request, res: Response)=>{
+
+    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword
+
+    const decodedToken =  req.user
+
+    await authService.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload)
+
+
+    res.status(httpsCode.OK).json({
+        success: true,
+        message: "password reset successfully",
+        data: null
+    })
+    
+})
 const resetPassword = catchAsyncError(async(req: Request, res: Response)=>{
 
     const oldPassword = req.body.oldPassword
@@ -138,6 +155,22 @@ const resetPassword = catchAsyncError(async(req: Request, res: Response)=>{
     res.status(httpsCode.OK).json({
         success: true,
         message: "password reset successfully",
+        data: null
+    })
+    
+})
+const setPassword = catchAsyncError(async(req: Request, res: Response)=>{
+
+
+    const decodedToken =  req.user as JwtPayload
+    const {password} = req.body
+
+    await authService.setPassword( decodedToken.userId , password)
+
+
+    res.status(httpsCode.OK).json({
+        success: true,
+        message: "password set successfully",
         data: null
     })
     
@@ -194,5 +227,7 @@ export const authController = {
     logout,
     resetPassword,
     googleCallback,
-    googleController
+    googleController,
+    changePassword,
+    setPassword
 }

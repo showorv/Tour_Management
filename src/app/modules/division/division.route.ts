@@ -19,6 +19,7 @@ multerUpload.single("file"),
  route.get("/:slug", divisionController.getSingleDivision)
 
  route.patch("/:id", checkAuth(Role.SUPERADMIN, Role.ADMIN),
+ multerUpload.single("file"),
     validateSchma(updateDivisionSchema),
     divisionController.updateDivision
  )

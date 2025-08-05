@@ -59,7 +59,12 @@ const updateDivision = catchAsyncError(async(req: Request, res: Response)=>{
 
     const id = req.params.id
 
-    const updateDivisions = await divisionServices.updateDivisionService(id, req.body)
+    const payload: IDivision = {
+        ...req.body,
+        thumbnail: req.file?.path
+    }
+
+    const updateDivisions = await divisionServices.updateDivisionService(id, payload)
 
 
     sendResponse(res, {

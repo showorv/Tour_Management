@@ -1,3 +1,4 @@
+import { cloudinaryDeleteUpload } from "../../config/cloudinary.config"
 import AppError from "../../errorHelpers/AppError"
 import { IDivision } from "./division.interface"
 import { Division } from "./division.model"
@@ -85,6 +86,10 @@ const updateDivisionService = async (id: string, payload: Partial<IDivision>)=>{
     // }
 
     const updateDivision = await Division.findByIdAndUpdate ( id, payload , {new: true, runValidators: true})
+
+    if(payload.thumbnail && divisionExist.thumbnail){
+        await cloudinaryDeleteUpload(divisionExist.thumbnail);
+    }
 
     return updateDivision;
 

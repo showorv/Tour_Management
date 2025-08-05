@@ -4,7 +4,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-google-oauth20";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
-import { Role } from "../modules/user/user.interface";
+import { IActive, Role } from "../modules/user/user.interface";
 import { Strategy as  LocalStrategy} from "passport-local";
 import bcryptjs from "bcryptjs"
 
@@ -22,6 +22,22 @@ passport.use(
         if(!userExist){
             return done(null, false, {message: "user doesnot exist"})
         }
+
+        if(userExist.isActive === IActive.BLOCKED ||userExist.isActive === IActive.INACTIVE ){
+            // throw new AppError(httpsCode.BAD_REQUEST, "user is block or inactive")
+            return done ("user is block or inactive")
+        }
+        if(userExist.isDeleted){
+            // throw new AppError(httpsCode.BAD_REQUEST, "user is deleted")
+
+            return done ("user is deleted")
+        }
+        if(!userExist.isVerified){
+        //   throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
+
+        return done ("user isnot verified")
+        }
+  
 
         const isGoogleAuthenticated = userExist.auths.some(providerCheck => providerCheck.provider == "google");
 
@@ -63,6 +79,24 @@ passport.use(
             }
 
             let user = await User.findOne({email})
+
+          
+    
+            if(user && user.isActive === IActive.BLOCKED || user && user.isActive === IActive.INACTIVE ){
+                // throw new AppError(httpsCode.BAD_REQUEST, "user is block or inactive")
+                return done ("user is block or inactive")
+            }
+            if(user && user.isDeleted){
+                // throw new AppError(httpsCode.BAD_REQUEST, "user is deleted")
+    
+                return done (null, false, {message: "user is deleted"})
+            }
+            if( user && !user.isVerified){
+            //   throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
+    
+            return done ("user isnot verified")
+            }
+      
 
             if(!user){
                 user = await User.create({

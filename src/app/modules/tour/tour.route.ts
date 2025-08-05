@@ -32,7 +32,9 @@ validateSchma(createTourZodSchema),
  tourController.createTour)
 router.get("/",  tourController.getTour)
 router.get("/:slug",  tourController.getSingleTour)
-router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), validateSchma(updateTourZodSchema), tourController.updateTour)
+router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), 
+multerUpload.array("files"),
+validateSchma(updateTourZodSchema), tourController.updateTour)
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), tourController.deleteTour)
 
 

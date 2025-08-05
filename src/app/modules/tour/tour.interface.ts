@@ -23,5 +23,6 @@ export interface ITour {
     minAge?: number;
     division: Types.ObjectId 
     tourType: Types.ObjectId  // tourtype alada banabo karon filtering er jnne kaje ashbe
+    deleteImages?: string[]
 
 }

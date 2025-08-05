@@ -5,6 +5,7 @@ import { Tour, TourType } from "./tour.model"
 import { tourSearchable } from "./tour.constants"
 import { Query } from "mongoose"
 import { QueryBuilder } from "../../utils/queryBuilder"
+import { cloudinaryDeleteUpload } from "../../config/cloudinary.config"
 
 
 const createTourService = async (payload: ITour)=>{
@@ -166,7 +167,41 @@ const updateTour = async (id: string, payload: Partial<ITour>)=> {
     //     payload.slug = slug
     // }
 
+
+
+    // case 1: upload image in update
+
+    if(payload.images && payload.images.length > 0 && tourExist.images && tourExist.images?.length > 0){
+        payload.images = [...payload.images , ...tourExist.images]
+    }
+
+     // case 2: if user want to delete especific images during update then->  data -> deleteImages: [ "imgurl1", "imgurl2"]
+
+     if(payload.deleteImages && payload.deleteImages.length > 0 && tourExist.images && tourExist.images?.length > 0 ){
+
+        const restDBImages = tourExist.images.filter(imgUrl => !payload.deleteImages?.includes(imgUrl)) // means user j gula delete korbe na segula theke jabe
+
+        const updatedPayloadImages = (payload.images || [])
+        .filter (imgUrl => !payload.deleteImages?.includes(imgUrl))
+        .filter (imgUrl => !restDBImages?.includes(imgUrl))
+
+        payload.images = [...restDBImages , ...updatedPayloadImages]
+
+
+
+     }
+
     const updateTour = await Tour.findByIdAndUpdate ( id, payload , {new: true, runValidators: true})
+
+   // case 3: delete from cloudinary
+
+   if(payload.deleteImages && payload.deleteImages.length > 0 && tourExist.images && tourExist.images?.length > 0 ){
+
+    await Promise.all(payload.deleteImages.map (imgUrl => cloudinaryDeleteUpload(imgUrl)))
+
+ }
+
+
 
     return updateTour;
 }

@@ -1,6 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
 import { catchAsyncError } from "../../utils/catchAsyncError";
-import { IActive, Iuser } from "../user/user.interface";
+import { IActive, IAuths, Iuser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import httpsCode from "http-status-codes"
 import bcryptjs from "bcryptjs"
@@ -74,7 +74,7 @@ const getNewAccessToken =async ( refreshToken: string)=>{
     }
 
 }
-const resetPassword =async (oldPassword: string, newPassword: string, decodedToken: JwtPayload)=>{
+const changePassword =async (oldPassword: string, newPassword: string, decodedToken: JwtPayload)=>{
 
     // check old password  get old password from verifiedtoken. hash the newpassword and save in user
 
@@ -95,10 +95,46 @@ const resetPassword =async (oldPassword: string, newPassword: string, decodedTok
     user.save();
 
 }
+const resetPassword =async (oldPassword: string, newPassword: string, decodedToken: JwtPayload)=>{
+
+   
+return {}
+
+}
+const setPassword =async (userId: string, password: string)=>{
+
+   const user = await User.findById(userId)
+
+   if(!user){
+    throw new AppError(httpsCode.FORBIDDEN, "user not found")
+   }
+
+   if( user.password && user.auths.some(providerObject => providerObject.provider==="google")){
+    throw new AppError(httpsCode.FORBIDDEN, "user already has password. you can change password from profile")
+   }
+
+   const hashPassword = await bcryptjs.hash ( password, Number(envVars.HASH_SALT))
+
+   const credentialAuths : IAuths = {
+    provider: "credential",
+    providerId: user.email
+   }
+
+   const auths: IAuths [] = [...user.auths, credentialAuths]
+
+   user.password = hashPassword
+
+   user.auths = auths
+
+   await user.save()
+
+}
 
 
 export const authService = {
     createLoginService,
     getNewAccessToken,
-    resetPassword
+    resetPassword,
+    changePassword,
+    setPassword
 }
