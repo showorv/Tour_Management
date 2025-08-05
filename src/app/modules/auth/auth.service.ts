@@ -8,6 +8,7 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import { generateToken, verifiedToken } from "../../utils/generateToken";
 import { envVars } from "../../config/env";
 import { createUserToken } from "../../utils/createUserToken";
+import { sendEmail } from "../../utils/sendEmail";
 
 
 const createLoginService =async (payload: Partial<Iuser>)=>{
@@ -95,10 +96,26 @@ const changePassword =async (oldPassword: string, newPassword: string, decodedTo
     user.save();
 
 }
-const resetPassword =async (oldPassword: string, newPassword: string, decodedToken: JwtPayload)=>{
+const resetPassword =async (payload: Record<string,any>, decodedToken: JwtPayload)=>{
 
-   
-return {}
+    if(payload.id !== decodedToken.userId){
+        throw new AppError(401, "you cannot change password")
+    }
+
+
+    const user = await User.findById(decodedToken.userId)
+
+    if(!user){
+        throw new AppError(401, "user not found")
+    }
+
+    const hashPassword = await bcryptjs.hash ( payload.newPassword, Number(envVars.HASH_SALT))
+
+    user.password = hashPassword
+
+    await user.save()
+
+
 
 }
 const setPassword =async (userId: string, password: string)=>{
@@ -129,6 +146,48 @@ const setPassword =async (userId: string, password: string)=>{
    await user.save()
 
 }
+const forgotPassword =async (email: string)=>{
+
+   const userExist = await User.findOne({email})
+
+        if(!userExist){
+            throw new AppError(httpsCode.BAD_REQUEST, "user not exist")
+        }
+
+        if(userExist.isActive === IActive.BLOCKED ||userExist.isActive === IActive.INACTIVE ){
+            throw new AppError(httpsCode.BAD_REQUEST, "user is block or inactive")
+        }
+        if(userExist.isDeleted){
+            throw new AppError(httpsCode.BAD_REQUEST, "user is deleted")
+        }
+        // if(!userExist.isVerified){
+        // throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
+        // }
+        
+        const JwtPayload = {
+            userId: userExist._id,
+            email: userExist.email,
+            role: userExist.role
+        }
+
+        const resetToken = jwt.sign(JwtPayload, envVars.JWT_SECRET as string , {
+            expiresIn: "10m"
+        })
+
+        const forgotUILink = `${envVars.FRONTEND_URL}/reset-password?id=${userExist._id}&token=${resetToken}`
+
+        sendEmail({
+            to: userExist.email,
+            subject: "Reset Password ",
+            templateName: "sendEmail",
+            templateData: {
+                name: userExist.name,
+                reseturl: forgotUILink,
+            }
+        })
+        
+
+}
 
 
 export const authService = {
@@ -136,5 +195,6 @@ export const authService = {
     getNewAccessToken,
     resetPassword,
     changePassword,
-    setPassword
+    setPassword,
+    forgotPassword
 }

@@ -91,10 +91,11 @@ passport.use(
     
                 return done (null, false, {message: "user is deleted"})
             }
+
             if( user && !user.isVerified){
             //   throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
     
-            return done ("user isnot verified")
+            return done ("user is not verified")
             }
       
 
