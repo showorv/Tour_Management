@@ -160,9 +160,9 @@ const forgotPassword =async (email: string)=>{
         if(userExist.isDeleted){
             throw new AppError(httpsCode.BAD_REQUEST, "user is deleted")
         }
-        // if(!userExist.isVerified){
-        // throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
-        // }
+        if(!userExist.isVerified){
+        throw new AppError(httpsCode.BAD_REQUEST, "user is not verified")
+        }
         
         const JwtPayload = {
             userId: userExist._id,

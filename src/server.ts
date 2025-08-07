@@ -3,6 +3,7 @@ import app from "./app";
 import {Server} from "http"
 import { envVars } from "./app/config/env";
 import { superAdmin } from "./app/seed/seed";
+import { connectRedis } from "./app/config/redis.config";
 
 
 let server: Server;
@@ -26,6 +27,7 @@ async function main() {
     }
 }
 (async()=>{
+    await connectRedis()
    await main()
    await superAdmin()
 })()
