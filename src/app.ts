@@ -7,6 +7,7 @@ import { routeNotFound } from "./app/middlewares/routeNotFound"
 import cookieParser from "cookie-parser"
 import passport from "passport"
 import expressSession from "express-session"
+import { envVars } from "./app/config/env"
 
 const app:Application = express()
 
@@ -21,7 +22,10 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({extended: true})) // for read form-data
 
-app.use(cors())
+app.use(cors({
+    origin: envVars.FRONTEND_URL,
+    credentials: true
+}))
 
 
 

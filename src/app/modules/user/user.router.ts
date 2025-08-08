@@ -18,6 +18,8 @@ router.post(
 router.get("/users",checkAuth("ADMIN","SUPERADMIN"), userController.getAllUser);
 router.get("/me",checkAuth(...Object.values(Role)), userController.getMe);
 
+router.get("/:id", checkAuth(Role.ADMIN, Role.SUPERADMIN), userController.getSingleUser)
+
 router.patch("/:id", 
 checkAuth(...Object.values(Role)),
 multerUpload.single("file"),

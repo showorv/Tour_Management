@@ -91,33 +91,16 @@ const changePassword =async (oldPassword: string, newPassword: string, decodedTo
         throw new AppError(httpsCode.FORBIDDEN, "old password is incorrect")
     }
 
+    if(oldPassword === newPassword){
+        throw new AppError(httpsCode.FORBIDDEN, "new password cannot be same as old password")
+    }
+
     user.password = await bcryptjs.hash(newPassword, Number(envVars.HASH_SALT))
 
     user.save();
 
 }
-const resetPassword =async (payload: Record<string,any>, decodedToken: JwtPayload)=>{
 
-    if(payload.id !== decodedToken.userId){
-        throw new AppError(401, "you cannot change password")
-    }
-
-
-    const user = await User.findById(decodedToken.userId)
-
-    if(!user){
-        throw new AppError(401, "user not found")
-    }
-
-    const hashPassword = await bcryptjs.hash ( payload.newPassword, Number(envVars.HASH_SALT))
-
-    user.password = hashPassword
-
-    await user.save()
-
-
-
-}
 const setPassword =async (userId: string, password: string)=>{
 
    const user = await User.findById(userId)
@@ -188,7 +171,28 @@ const forgotPassword =async (email: string)=>{
         
 
 }
+const resetPassword =async (payload: Record<string,any>, decodedToken: JwtPayload)=>{
 
+    if(payload.id !== decodedToken.userId){
+        throw new AppError(401, "you cannot change password")
+    }
+
+
+    const user = await User.findById(decodedToken.userId)
+
+    if(!user){
+        throw new AppError(401, "user not found")
+    }
+
+    const hashPassword = await bcryptjs.hash ( payload.newPassword, Number(envVars.HASH_SALT))
+
+    user.password = hashPassword
+
+    await user.save()
+
+
+
+}
 
 export const authService = {
     createLoginService,

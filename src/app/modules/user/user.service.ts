@@ -41,10 +41,21 @@ const updateUser = async(userId: string, payload: Partial<Iuser>, decodeToken: J
         // name address password can updateUser. password will rehashing
         // role isverified isdelete isactive cant update without admin or superadmin
 
+        if(decodeToken.role === Role.USER || decodeToken.role === Role.GUIDE){
+            if(userId !== decodeToken.userId){
+                throw new AppError(httpStatus.FORBIDDEN, "you are not authorized")
+            }
+        }
+
         const findUser = await User.findById(userId)
 
         if(!findUser){
             throw new AppError(httpStatus.NOT_FOUND, "user not found")
+        }
+
+ 
+        if(decodeToken.role === Role.ADMIN && findUser.role === Role.SUPERADMIN){  // this means admin cannot update super admin
+            throw new AppError(httpStatus.FORBIDDEN, "you are not authorized")
         }
 
         if(payload.role){
@@ -52,9 +63,9 @@ const updateUser = async(userId: string, payload: Partial<Iuser>, decodeToken: J
                 throw new AppError(httpStatus.FORBIDDEN, "you are not authorized")
             }
 
-            if(payload.role === Role.SUPERADMIN || decodeToken.role === Role.ADMIN){
-                throw new AppError(httpStatus.FORBIDDEN, "you are not authorized")
-            }
+            // if(payload.role === Role.SUPERADMIN || decodeToken.role === Role.ADMIN){
+            //     throw new AppError(httpStatus.FORBIDDEN, "you are not authorized")
+            // }
         }
 
         if(payload.isActive || payload.isDeleted ||  payload.isVerified){
@@ -63,9 +74,9 @@ const updateUser = async(userId: string, payload: Partial<Iuser>, decodeToken: J
             }
         }
 
-        if(payload.password){
-            payload.password = await bcryptjs.hash(payload.password,Number( envVars.HASH_SALT))
-        }
+        // if(payload.password){
+        //     payload.password = await bcryptjs.hash(payload.password,Number( envVars.HASH_SALT))
+        // }
 
         const newUpdateUser = await User.findByIdAndUpdate(userId, payload, {new: true, runValidators: true})
 
@@ -89,7 +100,18 @@ const getUser = async()=>{
         }
     }
 }
+
 const getMe = async(userId: string)=>{
+
+    const user = await User.findById(userId).select("-password")
+
+    return user;
+
+
+
+   
+}
+const getSingleUser = async(userId: string)=>{
 
     const user = await User.findById(userId).select("-password")
 
@@ -104,5 +126,6 @@ export const userService = {
     createUser,
     getUser,
     updateUser,
-    getMe
+    getMe,
+    getSingleUser
 }

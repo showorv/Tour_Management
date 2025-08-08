@@ -13,6 +13,7 @@ export enum PaymentStatus{
 export interface IPayment {
 
     booking: Types.ObjectId;
+   
     transactionId: string; // unique like slung
     amount: number;
     paymentGateway ?: any;

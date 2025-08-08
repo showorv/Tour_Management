@@ -1,3 +1,5 @@
+import { JwtPayload } from "jsonwebtoken";
+import { uploadBufferInCloudinary } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { IInvoiceData, generatePDF } from "../../utils/invoice";
 import { sendEmail } from "../../utils/sendEmail";
@@ -10,6 +12,12 @@ import { Iuser } from "../user/user.interface";
 import { PaymentStatus } from "./payment.interface";
 import { Payment } from "./payment.model";
 import httpsStatus from "http-status-codes"
+import { Types } from "mongoose";
+
+
+export interface IBookingUser {
+    user: Types.ObjectId
+}
 
 const initPayment =async (bookingId: string)=>{
 
@@ -98,6 +106,13 @@ const paymentSuccess =async (query: Record<string ,string>)=>{
                 }
 
             const bufferPDF =await generatePDF(invoiceData)
+
+            const paymentUrl = await uploadBufferInCloudinary(bufferPDF, "invoice")
+
+            // console.log(paymentUrl);
+
+            await Payment.findByIdAndUpdate(updatedPayment._id, {invoiceUrl: paymentUrl?.secure_url}, {runValidators: true, session})
+            
 
             await sendEmail({
                 to:( updatedBooking.user as unknown as Iuser).email,
@@ -204,4 +219,38 @@ try {
 }
 
 
-export const paymentService = {paymentCancel,paymentFail,paymentSuccess,initPayment}
+const invoicePaymentDownloadUrl = async (paymentId: string, decodedToken: JwtPayload)=>{
+
+    if(!decodedToken.userId){
+        throw new AppError(401, "you cannot access this")
+    }
+
+
+
+    const payment = await Payment.findById(paymentId)
+    .populate<{ booking: IBookingUser }>({
+        path: "booking",
+        select: "user"
+    })
+    .select("invoiceUrl booking")
+
+    if(!payment){
+        throw new AppError(401, " payment not found")
+    }
+
+    if(!payment.invoiceUrl){
+        throw new AppError(401, " payment not found")
+    }
+
+    const bookingUserId = payment?.booking?.user?.toString();
+    // console.log(bookingUserId);
+    
+
+    if (bookingUserId !== decodedToken.userId) {
+        throw new AppError(403, "You are not authorized to view this invoice");
+    }
+    return payment.invoiceUrl
+}
+
+
+export const paymentService = {paymentCancel,paymentFail,paymentSuccess,initPayment, invoicePaymentDownloadUrl}

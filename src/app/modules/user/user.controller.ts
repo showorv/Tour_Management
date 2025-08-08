@@ -100,5 +100,18 @@ const updateUser = catchAsyncError(async(req: Request,res: Response)=>{
     })
 })
 
+export const getSingleUser = catchAsyncError(async(req: Request,res: Response)=>{
 
-export const userController =  {createUser, getAllUser, updateUser, getMe}
+    const {id} = req.params
+
+    const user = await userService.getSingleUser(id)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "single user retrived successfully",
+        data: user,
+       
+    })
+})
+export const userController =  {createUser, getAllUser, updateUser, getMe,getSingleUser}

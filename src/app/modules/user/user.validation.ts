@@ -33,13 +33,13 @@ export const updateUserValidation = z.object({
     .max(50, { message: "name is too long" })
     .optional(),
 
-  password: z
-    .string()
-    .min(6, { message: "password have to minimum 6 char" })
-    .regex(/^(?=.*[A-Z]).{6,}$/, {
-      message: "Password must include at least one uppercase letter",
-    })
-    .optional(),
+  // password: z
+  //   .string()
+  //   .min(6, { message: "password have to minimum 6 char" })
+  //   .regex(/^(?=.*[A-Z]).{6,}$/, {
+  //     message: "Password must include at least one uppercase letter",
+  //   })
+  //   .optional(),
 
   phone: z
     .string()

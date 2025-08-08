@@ -4,6 +4,7 @@ import { paymentService } from "./payment.service";
 import { envVars } from "../../config/env";
 import { sendResponse } from "../../utils/response";
 import httpStatus from "http-status-codes"
+import { JwtPayload } from "jsonwebtoken";
 
 const initPayment = catchAsyncError(async(req: Request, res: Response)=>{
    
@@ -46,5 +47,19 @@ const paymentCancel = catchAsyncError(async(req: Request, res: Response)=>{
     }
 })
 
+const invoicePaymentDownloadUrl = catchAsyncError(async(req: Request, res: Response)=>{
+   const decodedToken = req.user
+    const {paymentId}= req.params
+    const result = await paymentService.invoicePaymentDownloadUrl(paymentId, decodedToken as JwtPayload)
 
-export const paymentController = {paymentFail,paymentSuccess,paymentCancel,initPayment}
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "invoice url get successfully",
+        data: result
+    })
+
+})
+
+
+export const paymentController = {paymentFail,paymentSuccess,paymentCancel,initPayment, invoicePaymentDownloadUrl}
