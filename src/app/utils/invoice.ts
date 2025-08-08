@@ -13,7 +13,7 @@ export interface IInvoiceData{
 }
 
 
-const generatePDF =async (invoiceData: IInvoiceData)=>{
+export const generatePDF =async (invoiceData: IInvoiceData): Promise<Buffer>=>{
 
     try {
         return new Promise((resolve, reject)=>{

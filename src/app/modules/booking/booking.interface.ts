@@ -15,5 +15,6 @@ export interface IBooking {
     tour: Types.ObjectId,
     payment?: Types.ObjectId,
     guestCount: number,
-    status: BookingStatus
+    status: BookingStatus,
+    createdAt?: Date
 }

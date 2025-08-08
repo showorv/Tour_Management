@@ -1,8 +1,12 @@
 import AppError from "../../errorHelpers/AppError";
+import { IInvoiceData, generatePDF } from "../../utils/invoice";
+import { sendEmail } from "../../utils/sendEmail";
 import { BookingStatus } from "../booking/booking.interface";
 import { Booking } from "../booking/booking.model"
 import { ISSLComerz } from "../sslcomerz/sslcomerz.interface";
 import { sslcomerzService } from "../sslcomerz/sslcomerz.service";
+import { ITour } from "../tour/tour.interface";
+import { Iuser } from "../user/user.interface";
 import { PaymentStatus } from "./payment.interface";
 import { Payment } from "./payment.model";
 import httpsStatus from "http-status-codes"
@@ -68,12 +72,52 @@ const paymentSuccess =async (query: Record<string ,string>)=>{
             },
             {new: true, runValidators: true, session})
         
+            if(!updatedPayment){
+                throw new AppError(401, "payment not found")
+            }
         
-            await Booking.findByIdAndUpdate( 
+          const updatedBooking =  await Booking.findByIdAndUpdate( 
                 updatedPayment?.booking, 
                 { status: BookingStatus.COMPLETE}, 
                 {new: true, runValidators: true, session})
+                .populate("tour", "title")
+                .populate("user", "name email")
             
+                if(!updatedBooking){
+                    throw new AppError(401, "booking not found")
+                }
+
+                const invoiceData: IInvoiceData = {
+                    bookingDate: updatedBooking?.createdAt as Date,
+                    guestCount: updatedBooking.guestCount,
+                    totalAmount: updatedPayment?.amount,
+                    tourTitle:( updatedBooking.tour as unknown as ITour).title,
+                    transactionId: updatedPayment?.transactionId,
+                    userName: (updatedBooking.user as unknown as Iuser).name
+
+                }
+
+            const bufferPDF =await generatePDF(invoiceData)
+
+            await sendEmail({
+                to:( updatedBooking.user as unknown as Iuser).email,
+                subject: "Your booking invoice",
+                templateName: "invoice",
+                templateData: {
+                    name: ( updatedBooking.user as unknown as Iuser).name,
+                    transactionId: updatedPayment.transactionId,
+                    paid: updatedPayment.amount
+                },
+                attachments: [
+                    {
+                        filename: "invoice.pdf",
+                        content: bufferPDF,
+                        contentType: "application/pdf"
+                    }
+                ]
+            })
+
+
         
         
             await session.commitTransaction() // transaction here
