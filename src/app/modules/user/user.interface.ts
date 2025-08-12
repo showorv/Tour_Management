@@ -33,5 +33,6 @@ export interface Iuser {
     auths: IAuths[] // user google o dite prbe + chaile update e passoword o dite prbe
     bookings?: Types.ObjectId[]
     guides?: Types.ObjectId[]
+    createdAt?: Date
 
 }
