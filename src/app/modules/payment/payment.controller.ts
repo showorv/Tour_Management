@@ -5,6 +5,7 @@ import { envVars } from "../../config/env";
 import { sendResponse } from "../../utils/response";
 import httpStatus from "http-status-codes"
 import { JwtPayload } from "jsonwebtoken";
+import { sslcomerzService } from "../sslcomerz/sslcomerz.service";
 
 const initPayment = catchAsyncError(async(req: Request, res: Response)=>{
    
@@ -60,6 +61,21 @@ const invoicePaymentDownloadUrl = catchAsyncError(async(req: Request, res: Respo
     })
 
 })
+const validatePayment = catchAsyncError(async(req: Request, res: Response)=>{
+
+    console.log("sslcomerz ipn url body", req.body);
+    
+   
+    const result = await sslcomerzService.validatePayment(req.body)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "payment validated successfully",
+        data: null
+    })
+
+})
 
 
-export const paymentController = {paymentFail,paymentSuccess,paymentCancel,initPayment, invoicePaymentDownloadUrl}
+export const paymentController = {paymentFail,paymentSuccess,paymentCancel,initPayment, invoicePaymentDownloadUrl, validatePayment}
