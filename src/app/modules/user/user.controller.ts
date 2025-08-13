@@ -1,10 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import httpStatus from "http-status-codes"
 import { userService } from "./user.service";
 import { catchAsyncError } from "../../utils/catchAsyncError";
 import { sendResponse } from "../../utils/response";
-import { verifiedToken } from "../../utils/generateToken";
-import { envVars } from "../../config/env";
+
 import { JwtPayload } from "jsonwebtoken";
 import { Iuser } from "./user.interface";
 

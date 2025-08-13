@@ -1,5 +1,5 @@
 import AppError from "../../errorHelpers/AppError";
-import { catchAsyncError } from "../../utils/catchAsyncError";
+
 import { IActive, IAuths, Iuser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import httpsCode from "http-status-codes"

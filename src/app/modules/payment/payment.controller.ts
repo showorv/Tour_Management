@@ -66,7 +66,7 @@ const validatePayment = catchAsyncError(async(req: Request, res: Response)=>{
     console.log("sslcomerz ipn url body", req.body);
     
    
-    const result = await sslcomerzService.validatePayment(req.body)
+    await sslcomerzService.validatePayment(req.body)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,

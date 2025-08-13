@@ -21,54 +21,57 @@ const createBooking = catchAsyncError(async(req: Request, res: Response)=>{
         data: booking
     })
 })
-const getAllBooking = catchAsyncError(async(req: Request, res: Response)=>{
+
+// const getAllBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking =await bookingService.getAllBooking()
+//     const booking =await bookingService.getAllBooking()
     
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Booking retrived successfully",
-        data: booking
-    })
-})
-const getUserBooking = catchAsyncError(async(req: Request, res: Response)=>{
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: "Booking retrived successfully",
+//         data: booking
+//     })
+// })
+// const getUserBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = await bookingService.getUserBooking()
+//     const booking = await bookingService.getUserBooking()
     
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Booking get successfully",
-        data: booking
-    })
-})
-const getSingleBooking = catchAsyncError(async(req: Request, res: Response)=>{
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: "Booking get successfully",
+//         data: booking
+//     })
+// })
+// const getSingleBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = await bookingService.getSingleBooking()
+//     const booking = await bookingService.getSingleBooking()
     
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Booking get successfully",
-        data: booking
-    })
-})
-const updateStatusBooking = catchAsyncError(async(req: Request, res: Response)=>{
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: "Booking get successfully",
+//         data: booking
+//     })
+// })
+// const updateStatusBooking = catchAsyncError(async(req: Request, res: Response)=>{
 
     
-    const booking = await bookingService.updateStatusBooking()
+//     const booking = await bookingService.updateStatusBooking()
     
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Booking status updated",
-        data: booking
-    })
-})
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: "Booking status updated",
+//         data: booking
+//     })
+// })
 
 
-export const bookingController = {createBooking, getAllBooking, getSingleBooking,getUserBooking,updateStatusBooking}
+export const bookingController = {createBooking, 
+    // getAllBooking, getSingleBooking,getUserBooking,updateStatusBooking
+}

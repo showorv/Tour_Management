@@ -71,8 +71,8 @@ const validatePayment = async (payload: any)=>{
 
         await Payment.updateOne({transactionId: payload.tran_id}, {paymentGateway:response.data}, {runValidators:true})
         
-    } catch (error) {
-        throw new AppError(401, "error in validatePayment")
+    } catch (error:any) {
+        throw new AppError(401, "error in validatePayment",error.message)
     }
 }
 export const sslcomerzService = {sslcomerzInitialize, validatePayment}

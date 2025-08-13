@@ -87,8 +87,7 @@ const createBookings = async(payload: Partial<IBooking>, userId: string)=>{
             amount: amount
         }], {session})
     
-        const updatedBoking = await Booking.findByIdAndUpdate
-                                            ( booking[0]._id , 
+        const updatedBoking = await Booking.findByIdAndUpdate( booking[0]._id , 
                                                 { payment: payment[0]._id}, 
                                                 {new: true, runValidators: true,session}
                                             ).populate("user", "name email phone address")
@@ -138,21 +137,23 @@ const createBookings = async(payload: Partial<IBooking>, userId: string)=>{
 
 }
 
-const getAllBooking =async ()=>{
+// const getAllBooking =async ()=>{
 
-}
+// }
 
-const getSingleBooking =async ()=>{
+// const getSingleBooking =async ()=>{
 
-}
+// }
 
 
-const getUserBooking = async()=>{
+// const getUserBooking = async()=>{
 
-}
+// }
 
-const updateStatusBooking =async ()=>{
+// const updateStatusBooking =async ()=>{
 
-}
+// }
 
-export const bookingService = {createBookings, getAllBooking, getSingleBooking,getUserBooking,updateStatusBooking}
+export const bookingService = {createBookings,
+    //  getAllBooking, getSingleBooking,getUserBooking,updateStatusBooking
+    }

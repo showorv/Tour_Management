@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express"
+import {  NextFunction, Request, Response } from "express"
 import { envVars } from "../config/env"
 import AppError from "../errorHelpers/AppError";
 import { cloudinaryDeleteUpload } from "../config/cloudinary.config";
@@ -15,7 +15,7 @@ export const globalError = async (err:any, req: Request, res: Response, next: Ne
 
     let statuscode = 500;
     let message = ` something went wrong `;
-    let errorSources: iError[] = [
+    const errorSources: iError[] = [
     //     {
     //     path: "",
     //     message: ""

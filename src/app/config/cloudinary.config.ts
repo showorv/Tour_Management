@@ -79,8 +79,8 @@ export const cloudinaryDeleteUpload = async (url : string)=>{
             console.log(`deleted images ${public_id}`);
             
         }
-    } catch (error) {
-        throw new AppError(401, "cloudinary image deletion failed")
+    } catch (error:any) {
+        throw new AppError(401, "cloudinary image deletion failed", error.message)
     }
 
 } // this delete function in globalError. if unnesseary error occur to create controller then file will not upload in cloudiniary

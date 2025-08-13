@@ -20,6 +20,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(cookieParser())
 app.use(express.json())
+app.set("trust proxy", 1)
 app.use(express.urlencoded({extended: true})) // for read form-data
 
 app.use(cors({
@@ -37,12 +38,13 @@ app.get("/",(req: Request,res: Response)=>{
     })
 })
 
-// global error
 
-app.use(globalError)
 
 // route not found
 
 app.use(routeNotFound)
+// global error
+
+app.use(globalError)
 
 export default app;

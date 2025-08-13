@@ -3,7 +3,7 @@ import AppError from "../../errorHelpers/AppError"
 import { ITour, ItourType } from "./tour.interface"
 import { Tour, TourType } from "./tour.model"
 import { tourSearchable } from "./tour.constants"
-import { Query } from "mongoose"
+
 import { QueryBuilder } from "../../utils/queryBuilder"
 import { cloudinaryDeleteUpload } from "../../config/cloudinary.config"
 
